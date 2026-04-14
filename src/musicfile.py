@@ -1,6 +1,10 @@
+from wsgiref import headers
+
 import eyed3
 from utils import clStr, decade_from_date, write_genre, get_year_mb
 import logging
+import requests
+from bs4 import BeautifulSoup
 
 def get_mp3_info(mp3_file):
     mp3info= {}
@@ -90,12 +94,27 @@ class musicfile:
             self.genre_calc = ''
             self.decade_artist = ''
 
+    def get_popularity(self):
+        if hasattr(self, 'artist') and hasattr(self, 'title'):
+            print(f"Getting popularity for {self.artist} - {self.title}")
+            search = self.artist + " " + self.title
+            headers = {'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'}
+            html = requests.get('https://www.youtube.com/results?search_query='+search, headers=headers).text
+            print(html)
+            soup = BeautifulSoup(html, 'html.parser')
+            for link in soup.find_all('a'):
+                if '/watch?v=' in link.get('href'):
+                    print(link.get('href'))
+                    # May change when Youtube Website may get updated in the future.
+                    video_link = link.get('href')
+
+
 
     def __str__(self):
         if hasattr(self, 'genre_calc') and hasattr(self, 'artist') and hasattr(self, 'decade_artist'):
-            return f"{self.name} by {self.artist} from the album {self.album} ({self.genre_calc}, {self.decade_artist})"
+            return f"{self.artist} {self.title} ({self.genre_calc}, {self.decade_artist})"
         elif hasattr(self, 'artist') and hasattr(self, 'title'):
-            return f"{self.name} by {self.artist} from the album {self.album} ({self.genre}, {self.year})"
+            return f"{self.artist} {self.title} ({self.genre}, {self.year})"
         else:
             return f"{self.name} (metadata not found)"
     

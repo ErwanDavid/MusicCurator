@@ -32,4 +32,5 @@ if (__name__ == "__main__"):
             cur_file = musicfile.musicfile(mp3_file)
             cur_file.get_metadata()
             cur_file.find_genre(artiste_curated, artiste_api, artiste_mb, allow_genre)
+            cur_file.get_popularity()
             print(cur_file)
