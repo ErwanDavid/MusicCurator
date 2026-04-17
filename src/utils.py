@@ -61,7 +61,8 @@ def clStr(MyStr):
     if MyStr == '' or MyStr is None:
         return ''
     retStr = re.sub(r'[^a-zA-Z0-9éèàç&êöë \-]', ' ', MyStr)
-    retStr = retStr.replace('www', '').replace('webm', '').replace('slider', '').replace('youtube', '')
+    retStr = retStr.replace('www', '').replace('webm', '').replace('slider', '').replace('youtube', '').replace('  ', ' ')
+    retStr = retStr.replace('official', '').replace('officiel', '').replace('clip', '') 
     #retStr = retStr.title()
     retStr = retStr.lower()
     return str(retStr)
