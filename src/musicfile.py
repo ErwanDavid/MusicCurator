@@ -5,6 +5,7 @@ from utils import clStr, decade_from_date, get_year_mb
 import logging
 import requests
 from bs4 import BeautifulSoup
+import utils
 
 def compute_score(nb_views):
     if nb_views   > 500000000:
@@ -22,6 +23,7 @@ def compute_score(nb_views):
 
 def get_mp3_info(mp3_file):
     mp3info= {}
+    mp3info['md5'] = utils.get_md5(mp3_file)
     try:
         audio = eyed3.load(mp3_file)
         if audio:
@@ -31,7 +33,7 @@ def get_mp3_info(mp3_file):
                 mp3info['album']  = clStr(audio.tag.album)
                 year = audio.tag.original_release_date or audio.tag.release_date or audio.tag.recording_date
                 if year:
-                    mp3info['year'] = clStr(str(year))
+                    mp3info['year'] = clStr(str(year))[:4]
                     mp3info['decade'] = decade_from_date(year)
                 if audio.tag.genre:
                     mp3info['genre']  = clStr(audio.tag.genre.name)
@@ -72,14 +74,18 @@ def get_artist_genre(artist, curated_dict, api_dict, mb_dict, allow_genre):
             logging.debug("   genre allowed: %s", allow_genre[genres])
             return allow_genre[genres], get_year_mb(artist_name, mb_dict), "mb"
         logging.info("   No allowed genre found for artist: %s, MB genres: %s", artist_name, genres)
-    elif 'genre' in artist:
+    else:
+        logging.debug("   No genre found for artist: %s", artist_name)
+    if 'genre' in artist:
         if artist['genre'] in allow_genre:
             logging.debug("   genre from tag allowed: %s", allow_genre[artist['genre']])
             return allow_genre[artist['genre']], get_year_mb(artist_name, mb_dict), "tag"
-        logging.info("   No genre found for artist: %s", artist_name)    
+        else:
+            logging.info("   No allowed genre found for artist: %s, TAG genres: %s", artist_name, artist['genre'])
+            return None, None, None
     else:
+        logging.info("   No genre found for artist: %s", artist_name)
         return None, None, None
-    return None, None, None
 
 class musicfile:
     def __init__(self, fullname):
@@ -88,16 +94,16 @@ class musicfile:
     def get_metadata(self):
         mp3_info = get_mp3_info(self.name)
         if mp3_info:
-            self.artist = mp3_info.get('artist', '')
-            self.title = mp3_info.get('title', '')
-            self.album = mp3_info.get('album', '')
-            self.genre = mp3_info.get('genre', '')
+            self.artist = mp3_info.get('artist', '').strip()
+            self.md5 = mp3_info.get('md5', '')
+            self.title = mp3_info.get('title', '').strip()
+            self.album = mp3_info.get('album', '').strip()
+            self.genre = mp3_info.get('genre', '').strip()
             self.year = mp3_info.get('year', '')
             self.decade = mp3_info.get('decade', '')
 
     def get_genre(self, curated_dict, api_dict, mb_dict, allow_genre):
         if hasattr(self, 'artist'):
-
             self.genre_calc, self.decade_artist, self.genre_src = get_artist_genre({'artist': self.artist}, curated_dict, api_dict, mb_dict, allow_genre)
         else:
             self.genre_calc = ''
@@ -119,7 +125,7 @@ class musicfile:
             except Exception as e:
                 logging.error(f"Error fetching popularity for {self.artist} {self.title}: {e}")
                 self.popularity = 'F'
-
+                self.nb_views = 0
 
 
     def __str__(self):

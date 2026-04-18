@@ -1,13 +1,15 @@
-pop	pop
-world	pop
+pop	Pop
+world	Pop
 rock	Rock Classique
 classic	rock Rock Classique
 country	Rock Classique
+classic rock	Rock Classique
+rock country	Rock Classique
 folk	Rock Classique
 60s	Rock Classique
 punk	Punko-cool
 punk-rock	Punko-cool
-pop rock	Rock Modernecool
+pop rock	Rock Moderne
 metal	Metal
 hardcore	Metal
 industrial metal	Metal
@@ -23,7 +25,7 @@ electronic	Electro
 instrumental	Electro
 jazz	Jazz
 Melodic Death Metal	metal
-indie Rock	Moderne
+indie	Rock Moderne
 alternative	Rock Moderne
 dance	DanceDisco
 disco	DanceDisco
@@ -37,3 +39,11 @@ classique	Classique
 heavy metal	Metal
 post-black metal	Metal
 death metal	Metal
+psytrance	Electro
+nu metal	Metal
+synthwave	Electro
+soundtrack	Variété
+classical
+progressive house	Electro
+goa	Electro
+Variété française	Pop Fr

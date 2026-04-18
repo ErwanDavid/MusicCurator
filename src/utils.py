@@ -1,6 +1,14 @@
 import pathlib
 import re, logging
+import hashlib
 
+
+def get_md5(file_path):
+    hash_md5 = hashlib.md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 
 def load_ressource_json(file_path):
@@ -44,17 +52,20 @@ def load_ressource(file_path):
                     resource_dict[artist_name] = (genre_tab[0], genre_tab[1], genre_tab[2], genre_tab[3], count)
     return resource_dict
 
+
+
+
 def decade_from_date(date):
     if isinstance(date, str):
         match = re.search(r'(\d{4})', date)
         if match:
             year = int(match.group(1)) +1
             decade = (year // 10) * 10
-            return f"{decade}s"
+            return f"{decade}s"[3:]
     elif hasattr(date, 'year'):
         year = date.year + 1
         decade = (year // 10) * 10
-        return f"{decade}s"
+        return f"{decade}s"[3:]
     return ''
 
 def clStr(MyStr):
@@ -62,7 +73,7 @@ def clStr(MyStr):
         return ''
     retStr = re.sub(r'[^a-zA-Z0-9éèàç&êöë \-]', ' ', MyStr)
     retStr = retStr.replace('www', '').replace('webm', '').replace('slider', '').replace('youtube', '').replace('  ', ' ')
-    retStr = retStr.replace('official', '').replace('officiel', '').replace('clip', '') 
+    retStr = retStr.replace('official', '').replace('officiel', '').replace('clip', '').replace('kz', '') 
     #retStr = retStr.title()
     retStr = retStr.lower()
     return str(retStr)
